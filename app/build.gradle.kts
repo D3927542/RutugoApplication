@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "uk.ac.tees.mad.d3927542"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "uk.ac.tees.mad.d3927542"
@@ -47,9 +47,34 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
+
+    /*
+        Gson by Google
+
+     implementation(libs.gson)
+     implementation(libs.retrofit2.converter.gson) */
+
+    /*
+        Import Retrofit2 Dependencies
+     */
+    implementation(libs.retrofit2)
+    implementation(libs.retrofit2.converter.scalars)
+
+    /*
+            Androidx Viewmodel
+     */
+    implementation(libs.androidx.lifecycle.viewmodel)
+
+
+
+    /*
+       Extended Icons
+     */
+    implementation(libs.androidx.compose.material.icons.extended)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -59,6 +84,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.databinding.adapters)
+    implementation(libs.appcompat.v7)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
