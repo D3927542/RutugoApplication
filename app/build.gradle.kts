@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services") //Apply the google Services plugin
 }
 
 android {
@@ -59,17 +60,21 @@ dependencies {
      implementation(libs.retrofit2.converter.gson) */
 
     /*
-        Import Retrofit2 Dependencies
+    Firebase
      */
-    implementation(libs.retrofit2)
-    implementation(libs.retrofit2.converter.scalars)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
+
+    /*
+    Jetpack Navigation
+     */
+    implementation("androidx.navigation:navigation-compose:2.6.0")
 
     /*
             Androidx Viewmodel
      */
     implementation(libs.androidx.lifecycle.viewmodel)
-
-
 
     /*
        Extended Icons

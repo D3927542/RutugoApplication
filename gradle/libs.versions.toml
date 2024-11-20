@@ -1,10 +1,12 @@
 [versions]
-#Retrofit2 from Square
-retrofit2 = "2.11.0"
-retrofit2ConverterScalars = "2.11.0"
 
 #Android Viewmodel
-viewModel = "2.6.1"
+firebaseBom = "33.6.0"
+googleServices = "4.4.2"
+compose = "1.1.1"
+gradle = "8.6.1"
+navigationCompose = "2.8.4"
+viewModel = "2.8.7"
 
 #Extended Icons Version
 extendedIcons = "1.7.5"
@@ -17,16 +19,12 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-composeBom = "2024.10.01"
-databindingAdapters = "7.0.0"
-appcompatV7 = "1.4.2"
+composeBom = "2024.11.00"
+databindingAdapters = "8.7.2"
 appcompat = "1.7.0"
 
 
 [libraries]
-# Define the library dependencies for Retrofit2
-retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
-retrofit2-converter-scalars = { group = "com.squareup.retrofit2", name = "converter-scalars", version.ref = "retrofit2ConverterScalars" }
 
 #Lifecycle Viewmodel
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewModel"}
@@ -35,6 +33,14 @@ androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "extendedIcons" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+#Firebase
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
