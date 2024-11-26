@@ -14,16 +14,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RutugoApplication"
         tools:targetApi="31">
+
+        <!-- Splashscreen set as the Launcher activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashScreen"
             android:exported="true"
             android:theme="@style/Theme.RutugoApplication">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        </application>
 
+        <!-- MainActivity will be opened after SplashScreen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.RutugoApplication">
+        </activity>
+
+        </application>
 </manifest>

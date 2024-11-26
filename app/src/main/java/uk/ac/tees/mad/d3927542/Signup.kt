@@ -37,6 +37,9 @@ fun Signup(navController: NavController) {
     var email by remember {
         mutableStateOf("")
     }
+    var emailError by remember {
+        mutableStateOf("")
+    }
     var password by remember {
         mutableStateOf("")
     }
@@ -65,7 +68,7 @@ fun Signup(navController: NavController) {
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it },
-                label = { Text("FullName") },
+                label = { Text("Full Name") },
                 modifier = Modifier.fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
@@ -73,12 +76,32 @@ fun Signup(navController: NavController) {
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    //combined multiple check to ensure the email.
+                    emailError = when {
+                    !it.contains("@") || !it.contains(".") || !it.endsWith("@gmail.com") ->
+                        "Please enter a valid email address"
+                    else -> "" //No error
+                }
+                                },
                 label = { Text("Email") },
+                isError = emailError.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
                     .padding(horizontal = 16.dp)
             )
+            //If the email is invalid, the error text is displayed in below the input field
+            if (emailError.isNotEmpty()) {
+                Text(
+                    emailError,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 16.dp, top = 4.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
+
             PasswordField(
                 value = password,
                 onValueChange = { password = it },
@@ -87,6 +110,7 @@ fun Signup(navController: NavController) {
                     .padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
+
             PasswordField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
@@ -118,7 +142,10 @@ fun Signup(navController: NavController) {
                 } else {
                     Toast.makeText(context, "Password do not match", Toast.LENGTH_SHORT).show()
                 }
-            }, modifier = Modifier.fillMaxWidth()
+            },
+                //The sign-up button remains disabled until the email passes validation.
+               enabled = emailError.isEmpty(),
+                modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 16.dp)
             ) {
                 Text("Sign Up")
