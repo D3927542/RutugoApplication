@@ -1,4 +1,6 @@
 [versions]
+#Room API
+roomApi = "2.6.1"
 
 #Android Viewmodel
 firebaseBom = "33.6.0"
@@ -25,13 +27,16 @@ appcompat = "1.7.0"
 
 
 [libraries]
+#Room API
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomApi" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomApi" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomApi" }
 
 #Lifecycle Viewmodel
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "viewModel"}
 
 #Extended Icons
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "extendedIcons" }
-
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 #Firebase
 

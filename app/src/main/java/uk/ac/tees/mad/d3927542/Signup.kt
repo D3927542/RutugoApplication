@@ -1,6 +1,7 @@
 package uk.ac.tees.mad.d3927542
 
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,8 +27,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import uk.ac.tees.mad.d3927542.data.User
+import uk.ac.tees.mad.d3927542.data.UserDatabase
 
 @Composable
 fun Signup(navController: NavController) {
@@ -47,6 +53,13 @@ fun Signup(navController: NavController) {
         mutableStateOf("")
     }
     val context = LocalContext.current
+
+    //Initialize Room Database
+    val userDb = Room.databaseBuilder(
+        context.applicationContext,
+        UserDatabase::class.java,
+        "user_database"
+    ).build()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -125,6 +138,15 @@ fun Signup(navController: NavController) {
                     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+
+                                //Firebase Registration Successful
+                                val userEmail = email
+                                val userName = fullName
+
+                                //Save user data locally using Room
+                                (context as? ComponentActivity)?.lifecycleScope?.launch {
+                                    userDb.userDao().insertUser(User(email = userEmail, name = userName))
+                                }
                                 Toast.makeText(
                                     context,
                                     "Account Created Successfully",
@@ -132,6 +154,7 @@ fun Signup(navController: NavController) {
                                 ).show()
                                 navController.navigate("login")
                             } else {
+                                //Firebase Registration Failed
                                 Toast.makeText(
                                     context,
                                     "Signup Failed: ${task.exception?.message}",

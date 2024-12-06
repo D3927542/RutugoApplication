@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services") //Apply the google Services plugin
+    id("com.google.devtools.ksp")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -54,6 +57,12 @@ android {
 dependencies {
 
     /*
+       dagger hilt
+     */
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-compiler:2.44")
+
+    /*
         Gson by Google
 
      implementation(libs.gson)
@@ -81,6 +90,21 @@ dependencies {
        Extended Icons
      */
     implementation(libs.androidx.compose.material.icons.extended)
+
+    /*
+        Room Database
+     */
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.ktx)
+
+    /*
+        coil for image loading
+     */
+    implementation(platform("androidx.compose:compose-bom:2024.10.01"))
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

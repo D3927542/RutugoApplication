@@ -1,6 +1,7 @@
 package uk.ac.tees.mad.d3927542
 
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,9 +29,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import uk.ac.tees.mad.d3927542.data.User
+import uk.ac.tees.mad.d3927542.data.UserDatabase
 
 @Composable
 fun Login(navController: NavController) {
@@ -42,8 +47,16 @@ fun Login(navController: NavController) {
     }
     val context = LocalContext.current
 
+    //Initialize Room Database
+    val userDb = Room.databaseBuilder(
+        context.applicationContext,
+        UserDatabase::class.java,
+        "user_database"
+    ).build()
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color(0xFFF5F5F5)) //Light Gray Background
     ) {
         Column(
@@ -85,9 +98,23 @@ fun Login(navController: NavController) {
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+
+                            //Firebase Auth Successful
+                            val userEmail = email
+
+                            //Save user to Room database
+                            (context as? ComponentActivity)?.lifecycleScope?.launch {
+                                //Check if user already exists in Room
+                                val existingUser = userDb.userDao().getUserByEmail(userEmail)
+                                if (existingUser == null) {
+                                    //Insert user into Room if not exists
+                                    userDb.userDao().insertUser(User(email = userEmail))
+                                }
+                            }
                             Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                            navController.navigate("home")
+                            navController.navigate("explore")
                         } else {
+                            //Firebase Auth Failed
                             Toast.makeText(
                                 context,
                                 "Login Failed: ${task.exception?.message}",
@@ -95,7 +122,8 @@ fun Login(navController: NavController) {
                             ).show()
                         }
                     }
-            }, modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(45.dp)
                 .clip(RoundedCornerShape(8.dp)) // rounded corners for the button
