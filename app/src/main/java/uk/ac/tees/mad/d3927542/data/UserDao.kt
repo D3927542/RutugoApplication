@@ -2,6 +2,7 @@ package uk.ac.tees.mad.d3927542.data
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
@@ -17,14 +18,12 @@ interface UserDao {
 interface DestinationDao {
 
         //Destination-related methods
-        @Insert
-        suspend fun insertDestination(destination: Destination)
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        suspend fun insertAll(destinations: List<Destination>)
 
-        @Query("SELECT * FROM destination_table")
+        @Query("SELECT * FROM destinations")
         suspend fun getAllDestinations(): List<Destination>
 
-        @Query("DELETE FROM destination_table WHERE id = :destinationId")
-        suspend fun deleteDestination(destinationId: Int)
     }
 
 

@@ -11,27 +11,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.customview.widget.ExploreByTouchHelper
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.google.firebase.firestore.FirebaseFirestore
 import uk.ac.tees.mad.d3927542.data.Destination
+
 
 /**
  * Composable function that represents the Explore page, displaying a list of destinations
@@ -39,47 +41,27 @@ import uk.ac.tees.mad.d3927542.data.Destination
  */
 @Composable
 fun Explore(navController: NavController) {
-    //Mutable list to store the destination fetched from firestore.
-    val destinations = remember {
-        mutableStateListOf<Destination>()
-    }
-    //Search query state
-    var searchQuery by remember {
-        mutableStateOf("")
-    }
-    //Get a reference to the firestore database.
-    val db = FirebaseFirestore.getInstance()
+    val exploreViewModel: ExploreViewModel = hiltViewModel()
 
-    //LaunchedEffect is a side-effect that runs once when the composable is first composed.
-    //Here, it is used to fetch data from firestore.
+    //Search Query state
+    val searchQuery = remember { mutableStateOf("") }
 
+    //Observe destinations from ViewModel
+    val destinations by exploreViewModel.destinations.observeAsState(emptyList())
+    val loading by exploreViewModel.loading.observeAsState(false)
+    val error by exploreViewModel.error.observeAsState("")
+
+    //Fetch destinations on launch
     LaunchedEffect(Unit) {
-        //Fetch data from "destinations" collection in firestore.
-
-        db.collection("destinations")
-            .get()
-            .addOnSuccessListener { result ->
-                destinations.clear()
-                //iterate through each document in the result and convert it to a destination object.
-                for (document in result) {
-                      val destination = document.toObject(Destination::class.java)
-                    //Add the destination to the mutable list to update the UI.
-                    destinations.add(destination)
-                }
-            }
-            .addOnFailureListener{ exception ->
-                //Log an error message if the data fetch fails.
-                Log.e("FirestoreError", "Error fetching data", exception)
-            }
-    }
-
-    //Filtered destinations based on the search query
-    val filteredDestinations = destinations.filter {
-        it.name.contains(searchQuery, ignoreCase = true)
+        exploreViewModel.fetchDestinations()
     }
 
     //Page layout
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         //Title
         Text(
             text = "Explore",
@@ -90,30 +72,56 @@ fun Explore(navController: NavController) {
 
         //search bar
         OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
+            value = searchQuery.value,
+            onValueChange = { searchQuery.value = it },
             label = { Text("Search") },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
-    }
 
-    //Display the list of destinations in a scrollable LazyColumn.
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        //Create a list item for each destination in the list.
-        items(filteredDestinations.size) { index ->
-            DestinationCard(destination = filteredDestinations[index],
-                onClick = {
-                    navController.navigate("destination/${filteredDestinations[index].name}")
-                }
+        //Apply search filter
+        val filteredDestinations = destinations.filter {
+            it.name.contains(searchQuery.value, ignoreCase = true) ||
+                    it.description.contains(searchQuery.value, ignoreCase = true)
+        }
+
+        Log.d("Explore", "Search Query: ${searchQuery.value}")
+        Log.d("Explore", "Filtered Destinations: $filteredDestinations")
+        //Show loading spinner while fetching data
+        when {
+            loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            error.isNotEmpty() -> Text(
+                text = error,
+                color = androidx.compose.ui.graphics.Color.Red,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            
+
+            filteredDestinations.isEmpty() -> Text(
+                text = "No destinations found.",
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            else -> {
+                //Display the list of destinations in a scrollable LazyColumn.
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    //Create a list item for each destination in the list.
+                    items(filteredDestinations) { destination ->
+                        Log.d("Explore", "Destination: $destination")
+                        DestinationCard(destination = destination) {
+                            navController.navigate("destination/${destination.id}")
+                        }
+                    }
+
+                }
+            }
         }
     }
- }
+}
+
 /**
  * Composable function represents a card displaying a single destination's image,
  * name, and description

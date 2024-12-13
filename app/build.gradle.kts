@@ -40,6 +40,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    //Allow reference to generated code
+    kapt {
+        correctErrorTypes = true
+    }
     buildFeatures {
         compose = true
     }
@@ -59,8 +63,11 @@ dependencies {
     /*
        dagger hilt
      */
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-compiler:2.44")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.ui.viewbinding)
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
 
     /*
         Gson by Google

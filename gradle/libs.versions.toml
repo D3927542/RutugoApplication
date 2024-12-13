@@ -1,5 +1,9 @@
 [versions]
 #Room API
+hiltAndroid = "2.44"
+hiltCompiler = "2.44"
+hiltCompilerVersion = "1.0.0"
+hiltNavigationCompose = "1.2.0"
 roomApi = "2.6.1"
 
 #Android Viewmodel
@@ -24,9 +28,15 @@ activityCompose = "1.9.3"
 composeBom = "2024.11.00"
 databindingAdapters = "8.7.2"
 appcompat = "1.7.0"
+runtimeLivedata = "1.7.5"
+uiViewbinding = "1.7.6"
 
 
 [libraries]
+#dagger hilt
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompilerVersion" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+
 #Room API
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomApi" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomApi" }
@@ -47,6 +57,8 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -63,6 +75,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-databinding-adapters = { group = "androidx.databinding", name = "databinding-adapters", version.ref = "databindingAdapters" }
 appcompat-v7 = { group = "com.android.support", name = "appcompat-v7", version = "28.0.0" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding", version.ref = "uiViewbinding" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

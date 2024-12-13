@@ -9,26 +9,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.room.util.TableInfo
-import uk.ac.tees.mad.d3927542.data.Destination
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun DestinationDetailed(name: String, navController: NavController) {
+fun DestinationDetailed(destinationId: String?) {
+    val exploreViewModel: ExploreViewModel = hiltViewModel()
+    val destination = exploreViewModel.destinations.value?.find { it.id == destinationId }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Text(
-            text = "Destination Details",
+            text = destination?.name ?: "Destination Details",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
 
         )
         Text(
-            text = "Welcome to $name!",
+            text = destination?.description ?: "Description not available",
             fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
