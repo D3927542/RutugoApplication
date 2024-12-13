@@ -32,6 +32,7 @@ object AppModule {
         return Room.databaseBuilder(context, UserDatabase::class.java, "user_database")
             .addMigrations(MIGRATION_1_2) //Add the migration here
             .build()
+
     }
 
     @Provides
@@ -59,10 +60,25 @@ object AppModule {
                 id TEXT PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
-                imageUrl TEXT NOT NULL
+                imageUrl TEXT,
+                imageResId INTEGER,
+                location TEXT
 
             )
             """.trimIndent())
+
+            //Copy data from the old table to the new table
+            db.execSQL("""
+                INSERT INTO destinations_temp(id, name, description, imageUrl)
+                SELECT id, name, description, imageUrl
+                FROM destinations
+            """)
+
+            //drop the old table
+            db.execSQL("DROP TABLE destinations")
+
+            //Rename the temporary table
+            db.execSQL("ALTER TABLE destinations_temp RENAME TO destinations")
         }
 
     }    

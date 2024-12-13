@@ -112,7 +112,8 @@ fun Explore(navController: NavController) {
                     items(filteredDestinations) { destination ->
                         Log.d("Explore", "Destination: $destination")
                         DestinationCard(destination = destination) {
-                            navController.navigate("destination/${destination.id}")
+                            navController.navigate("destination/${destination.name}")
+                            Log.d("Navigation", "Navigating to: destination/${destination.name}")
                         }
                     }
 
