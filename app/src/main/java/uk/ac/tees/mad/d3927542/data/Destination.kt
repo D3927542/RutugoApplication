@@ -13,6 +13,12 @@ data class Destination(
     val imageResId: Int?
 ) {
         //no-argument constructor for firebase
-    constructor() : this("","","", null, null, null)
+    constructor() : this(
+            "",
+            "",
+            "",
+            null,
+            null,
+            null)
 
 }

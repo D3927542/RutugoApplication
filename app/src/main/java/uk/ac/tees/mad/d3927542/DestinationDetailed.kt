@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +48,9 @@ fun DestinationDetailed(destinationId: String?) {
 
     }
 
+    //get the current context
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,18 +73,22 @@ fun DestinationDetailed(destinationId: String?) {
         Text(
             text = "Description: ${destination.description}",
             fontSize = 18.sp,
-            color = Color.Gray,
+            color = Color.Black,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
         //Suggested travel data(Calendar UI)
         TravelDatePicker()
 
-        //Location information
+        //Button to open location in google maps
         Button(
             onClick = {
-                //Sync with the location or open a map
-                syncLocation(destination.location)
+              if (!destination.location.isNullOrEmpty()) {
+                  synclocation(context, destination.location)
+              } else {
+                  Log.e("DestinationDetailed", "Location not available")
+              }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,9 +113,4 @@ fun TravelDatePicker() {
         Text(text = "Option 1: Dec 25, 2024", modifier = Modifier.padding(4.dp))
         Text(text = "Option 2: Jan 1, 2025", modifier = Modifier.padding(4.dp))
     }
-}
-
-fun syncLocation(location: String?) {
-    //Logic to sync with a map service
-    println("Syncing location for $location")
 }
