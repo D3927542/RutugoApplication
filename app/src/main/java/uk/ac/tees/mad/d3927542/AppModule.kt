@@ -30,7 +30,7 @@ object AppModule {
     @Singleton
     fun provideUserDatabase(@ApplicationContext context: Context): UserDatabase {
         return Room.databaseBuilder(context, UserDatabase::class.java, "user_database")
-            .addMigrations(MIGRATION_1_2) //Add the migration here
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3) //Add the migration here
             .build()
 
     }
@@ -52,7 +52,7 @@ object AppModule {
     fun provideRoomRepository(destinationDao: DestinationDao): RoomRepository {
         return RoomRepository(destinationDao)
     }
-
+    //Migration from version 1 to 2
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("""
@@ -81,5 +81,36 @@ object AppModule {
             db.execSQL("ALTER TABLE destinations_temp RENAME TO destinations")
         }
 
-    }    
+    }
+    // Migration from version 2 to 3
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            //Create a new table with the updated schema
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS destinations_new (
+                id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                imageUrl TEXT,
+                location TEXT,
+                imageResId INTEGER, 
+                PRIMARY KEY(id)
+            )
+          """ )
+
+            //copy the data from old table to the new one
+            db.execSQL("""
+                INSERT INTO destinations_new(id, name, description, imageUrl, location, imageResId)
+                SELECT id, name, description, imageUrl, location, imageResId FROM destinations
+            """)
+
+            //Drop the old table
+            db.execSQL("DROP TABLE destinations")
+
+            //Rename the new table to the original table name
+            db.execSQL("ALTER TABLE destinations_new RENAME TO destinations ")
+        }
+    }
+
+
  }

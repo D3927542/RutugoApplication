@@ -1,5 +1,6 @@
 package uk.ac.tees.mad.d3927542
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,22 +8,43 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import uk.ac.tees.mad.d3927542.DestinationImage
 
 @Composable
-fun DestinationDetailed(destinationName: String?) {
-    val exploreViewModel: ExploreViewModel = hiltViewModel()
-    val destination = exploreViewModel.destinations.value?.find { it.name == destinationName }
+fun DestinationDetailed(destinationId: String?) {
+    Log.d("DestinationDetailed", "Received destinationId: $destinationId")
 
-    if (destination == null) {
-        Text(text = "Invalid Destination or not found.", modifier = Modifier.padding(16.dp))
+    val exploreViewModel: ExploreViewModel = hiltViewModel()
+
+    if (exploreViewModel.destinations.value.isNullOrEmpty()) {
+        exploreViewModel.fetchDestinations()
+    }
+
+    val destinations = exploreViewModel.destinations.observeAsState(emptyList()).value
+
+    Log.d("DestinationDetailed","Available destinations: $destinations")
+
+    if (destinations.isNullOrEmpty()) {
+        Log.d("DestinationDetailed","No destinations available.")
+        Text(text = "No destinations available", modifier = Modifier.padding(16.dp))
         return
+    }
+
+    //Find the destinations by id or name
+    val destination = destinations.find { it.id == destinationId }
+
+    //if the destination is not found, show an error message
+    if (destination == null) {
+        Log.d("DestinationDetailed", "Destination not found for id: $destinationId")
+        Text(text = "Destination not found.", modifier = Modifier.padding(16.dp))
+        return
+
     }
 
     Column(

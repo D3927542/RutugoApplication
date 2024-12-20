@@ -38,11 +38,11 @@ fun AppNavigation() {
         }
 
         //Destination detailed route
-        composable("destination/{name}",
-            deepLinks = listOf(navDeepLink { uriPattern = "android-app://uk.ac.tees.mad.d3927542/destination/{name?}" })
+        composable("destination/{destinationId}",
+            deepLinks = listOf(navDeepLink { uriPattern = "android-app://uk.ac.tees.mad.d3927542/destination/{name}" })
         ) { backStackEntry ->
-            val destinationName = backStackEntry.arguments?.getString("name")
-            DestinationDetailed(destinationName = destinationName)
+            val destinationId = backStackEntry.arguments?.getString("destinationId")
+            DestinationDetailed(destinationId = destinationId)
         }
 
 

@@ -112,8 +112,8 @@ fun Explore(navController: NavController) {
                     items(filteredDestinations) { destination ->
                         Log.d("Explore", "Destination: $destination")
                         DestinationCard(destination = destination) {
-                            navController.navigate("destination/${destination.name}")
-                            Log.d("Navigation", "Navigating to: destination/${destination.name}")
+                            navController.navigate("destination/${destination.id}")
+                            Log.d("Navigation", "Navigating to: destination/${destination.id}")
                         }
                     }
 
@@ -142,7 +142,7 @@ fun DestinationCard(destination: Destination, onClick: () -> Unit) {
        ) {
            //Display the destination image
            Image(
-               painter = rememberAsyncImagePainter(destination.imageUrl), //Load image from url
+               painter = rememberAsyncImagePainter( model = destination.imageUrl), //Load image from url
                contentDescription = "Destination Image",
                contentScale = ContentScale.Crop,
                modifier = Modifier

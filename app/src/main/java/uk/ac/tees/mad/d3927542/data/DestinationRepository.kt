@@ -20,11 +20,29 @@ class DestinationRepository @Inject constructor(
 
         for (document in result.documents) {
             val destination = document.toObject(Destination::class.java)
-            destination?.let { destinations.add(it) }
+            destination?.let {
+                it.id = document.id
+                destinations.add(it) }
         }
 
         //save data to Room for offline access
         destinationDao.insertAll(destinations)
         return destinations
+    }
+
+    //Fetch a single destination by id from firestore(online)
+    suspend fun getDestinationByIdOnline(id: String): Destination? {
+        val document = firestore.collection("destinations").document(id).get().await()
+        return if (document.exists()) {
+            document.toObject(Destination::class.java)?.apply {
+                this.id = document.id
+            }
+        } else {
+            null
+        }
+    }
+    //Fetch  a single destination by id from Room(offline)
+    suspend fun getDestinationByIdOffline(id: String): Destination? {
+        return destinationDao.getDestinationById(id)
     }
 }

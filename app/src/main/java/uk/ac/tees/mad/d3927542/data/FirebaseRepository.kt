@@ -13,7 +13,11 @@ class FirebaseRepository @Inject constructor(private val firestore: FirebaseFire
 
         for (document in result.documents) {
             val destination = document.toObject(Destination::class.java)
-            destination?.let { destinations.add(it) }
+            destination?.let {
+                //Set the Firestore document Id as the 'id' of the destination object
+                it.id = document.id
+                destinations.add(it)
+            }
         }
 
         return destinations
