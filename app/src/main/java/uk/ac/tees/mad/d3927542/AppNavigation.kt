@@ -25,14 +25,14 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "login") {
 
         //Login route
-       composable("login") {
-           Login(navController = navController)
-       }
+        composable("login") {
+            Login(navController = navController)
+        }
         //signup route
         composable("signup") {
             Signup(navController = navController)
         }
-          //Explore route
+        //Explore route
         composable("explore") {
             Explore(navController = navController)
         }
@@ -42,7 +42,16 @@ fun AppNavigation() {
             deepLinks = listOf(navDeepLink { uriPattern = "android-app://uk.ac.tees.mad.d3927542/destination/{name}" })
         ) { backStackEntry ->
             val destinationId = backStackEntry.arguments?.getString("destinationId")
-            DestinationDetailed(destinationId = destinationId)
+            DestinationDetailed(destinationId = destinationId,
+                navigateToHotels = { id ->
+                    navController.navigate("hotelInformation/$id")
+
+                }
+            )
+        }
+        composable("hotelInformation/{destinationId}") { backStackEntry ->
+            val destinationId = backStackEntry.arguments?.getString("destinationId")
+            HotelInformationScreen(destinationId = destinationId)
         }
 
 

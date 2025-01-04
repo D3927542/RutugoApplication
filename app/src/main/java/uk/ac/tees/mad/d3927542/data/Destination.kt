@@ -10,7 +10,8 @@ data class Destination(
     val description: String,
     val imageUrl: String?,
     val location: String?,
-    val imageResId: Int?
+    val imageResId: Int?,
+    var hotels: Hotel?
 ) {
         //no-argument constructor for firebase
     constructor() : this(
@@ -19,6 +20,8 @@ data class Destination(
             "",
             null,
             null,
-            null)
+            null,
+            null
+        )
 
 }

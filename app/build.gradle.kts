@@ -71,9 +71,8 @@ dependencies {
 
     /*
         Gson by Google
-
-     implementation(libs.gson)
-     implementation(libs.retrofit2.converter.gson) */
+     */
+    implementation("com.google.code.gson:gson:2.8.9")
 
     /*
     Firebase

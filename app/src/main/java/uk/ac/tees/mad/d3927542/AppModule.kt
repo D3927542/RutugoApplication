@@ -31,6 +31,7 @@ object AppModule {
     fun provideUserDatabase(@ApplicationContext context: Context): UserDatabase {
         return Room.databaseBuilder(context, UserDatabase::class.java, "user_database")
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3) //Add the migration here
+            .fallbackToDestructiveMigration()
             .build()
 
     }
@@ -52,11 +53,13 @@ object AppModule {
     fun provideRoomRepository(destinationDao: DestinationDao): RoomRepository {
         return RoomRepository(destinationDao)
     }
+
     //Migration from version 1 to 2
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            db.execSQL("""
-                CREATE TABLE IF NOT EXISTS destinations (
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS destinations_temp (
                 id TEXT PRIMARY KEY NOT NULL,
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
@@ -65,52 +68,49 @@ object AppModule {
                 location TEXT
 
             )
-            """.trimIndent())
+            """.trimIndent()
+            )
 
             //Copy data from the old table to the new table
-            db.execSQL("""
-                INSERT INTO destinations_temp(id, name, description, imageUrl)
-                SELECT id, name, description, imageUrl
+            db.execSQL(
+                """
+                INSERT INTO destinations_temp(id, name, description, imageUrl, imageResId, location)
+                SELECT id, name, description, imageUrl, imageResId, location
                 FROM destinations
-            """)
+            """.trimIndent()
+            )
 
             //drop the old table
-            db.execSQL("DROP TABLE destinations")
+            db.execSQL("DROP TABLE IF EXISTS destinations")
 
             //Rename the temporary table
             db.execSQL("ALTER TABLE destinations_temp RENAME TO destinations")
         }
 
     }
+
     // Migration from version 2 to 3
     private val MIGRATION_2_3 = object : Migration(2, 3) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            //Create a new table with the updated schema
-            db.execSQL("""
-                CREATE TABLE IF NOT EXISTS destinations_new (
-                id TEXT NOT NULL,
-                name TEXT NOT NULL,
-                description TEXT NOT NULL,
-                imageUrl TEXT,
-                location TEXT,
-                imageResId INTEGER, 
-                PRIMARY KEY(id)
-            )
-          """ )
+            val cursor = db.query("PRAGMA table_info(destinations)")
+            var columnExists = false
+            while (cursor.moveToNext()) {
+                val columnName = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                if (columnName == "hotels") {
+                    columnExists = true
+                    break
+                }
+            }
+            cursor.close()
 
-            //copy the data from old table to the new one
-            db.execSQL("""
-                INSERT INTO destinations_new(id, name, description, imageUrl, location, imageResId)
-                SELECT id, name, description, imageUrl, location, imageResId FROM destinations
-            """)
-
-            //Drop the old table
-            db.execSQL("DROP TABLE destinations")
-
-            //Rename the new table to the original table name
-            db.execSQL("ALTER TABLE destinations_new RENAME TO destinations ")
+            //Add 'hotels' column only if it does not exist
+            if (!columnExists) {
+                db.execSQL(
+                    """
+                ALTER TABLE destinations ADD COLUMN hotels TEXT
+                """
+                )
+            }
         }
     }
-
-
- }
+}

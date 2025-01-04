@@ -1,5 +1,6 @@
 package uk.ac.tees.mad.d3927542.data
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -22,7 +23,8 @@ class DestinationRepository @Inject constructor(
             val destination = document.toObject(Destination::class.java)
             destination?.let {
                 it.id = document.id
-                destinations.add(it) }
+                destinations.add(it)
+            }
         }
 
         //save data to Room for offline access
@@ -41,8 +43,29 @@ class DestinationRepository @Inject constructor(
             null
         }
     }
+
     //Fetch  a single destination by id from Room(offline)
     suspend fun getDestinationByIdOffline(id: String): Destination? {
         return destinationDao.getDestinationById(id)
     }
-}
+
+    //Fetch hotels for a specific destinations from firestore
+    suspend fun getHotelsForDestination(destinationId: String): Hotel? {
+        val document = firestore.collection("destinations").document(destinationId).get().await()
+
+        //Fetch hotels as a map from Firestore
+        val hotelData = document.get("hotels") as? Map<String, Any> ?: return null
+        Log.d("DestinationRepository", "Fetched hotels data: $hotelData")
+
+        return try {
+                Hotel(
+                    name = hotelData["name"] as? String ?: "Unknown",
+                    imageUrl = hotelData["imageUrl"] as? String ?: "",
+                )
+            } catch (e: Exception) {
+                //Log error and return a default Hotel object
+                Log.e("DestinationRepository", "Error mapping hotel: ${e.message}")
+                null
+            }
+        }
+    }

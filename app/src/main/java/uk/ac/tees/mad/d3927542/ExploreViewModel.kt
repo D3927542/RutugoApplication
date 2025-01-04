@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.d3927542.data.Destination
 import uk.ac.tees.mad.d3927542.data.DestinationRepository
+import uk.ac.tees.mad.d3927542.data.Hotel
 import javax.inject.Inject
 import kotlin.Exception
 
@@ -25,6 +26,9 @@ class ExploreViewModel @Inject constructor(
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
+
+    private val _hotels = MutableLiveData<Hotel?>()
+    val hotels: LiveData<Hotel?> = _hotels
 
     //Fetch destinations from firebase and fallback to Room if needed
     fun fetchDestinations() {
@@ -60,6 +64,25 @@ class ExploreViewModel @Inject constructor(
                     _loading.postValue(false)
 
                 }
+            }
+        }
+    }
+
+    //Fetch hotels for a specific destination
+    fun fetchHotels(destinationId: String) {
+        _loading.value = true
+        _error.value = ""
+        viewModelScope.launch {
+            try {
+                val hotelData = destinationRepository.getHotelsForDestination(destinationId)
+                Log.d("ExploreViewModel", "Fetched hotels for $destinationId: $hotelData")
+                _hotels.postValue(hotelData)
+                _loading.postValue(false)
+            } catch (exception: Exception) {
+                Log.e("ExploreViewModel", "Error fetching hotels: ${exception.message}")
+                _error.postValue("Error fetching hotels: ${exception.localizedMessage}")
+                _loading.postValue(false)
+
             }
         }
     }

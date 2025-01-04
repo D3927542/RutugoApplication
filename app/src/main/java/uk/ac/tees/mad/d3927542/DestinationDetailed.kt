@@ -1,13 +1,19 @@
 package uk.ac.tees.mad.d3927542
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,9 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import uk.ac.tees.mad.d3927542.data.Hotel
 
 @Composable
-fun DestinationDetailed(destinationId: String?) {
+fun DestinationDetailed(destinationId: String?, navigateToHotels: (String) -> Unit
+) {
     Log.d("DestinationDetailed", "Received destinationId: $destinationId")
 
     val exploreViewModel: ExploreViewModel = hiltViewModel()
@@ -27,12 +36,21 @@ fun DestinationDetailed(destinationId: String?) {
         exploreViewModel.fetchDestinations()
     }
 
-    val destinations = exploreViewModel.destinations.observeAsState(emptyList()).value
+    //Fetch hotels for the destinations
+    LaunchedEffect(destinationId) {
+        destinationId?.let { exploreViewModel.fetchHotels(it)
+        Log.d("DestinationDetailed", "Fetched hotels: ${exploreViewModel.hotels.value}")
+        }
+    }
 
-    Log.d("DestinationDetailed","Available destinations: $destinations")
+    val destinations = exploreViewModel.destinations.observeAsState(emptyList()).value
+    val hotel = exploreViewModel.hotels.observeAsState().value
+    Log.d("DestinationDetailed", "Fetched hotel: $hotel")
+
+    Log.d("DestinationDetailed", "Available destinations: $destinations")
 
     if (destinations.isNullOrEmpty()) {
-        Log.d("DestinationDetailed","No destinations available.")
+        Log.d("DestinationDetailed", "No destinations available.")
         Text(text = "No destinations available", modifier = Modifier.padding(16.dp))
         return
     }
@@ -48,7 +66,6 @@ fun DestinationDetailed(destinationId: String?) {
 
     }
 
-    //get the current context
     val context = LocalContext.current
 
     Column(
@@ -83,11 +100,11 @@ fun DestinationDetailed(destinationId: String?) {
         //Button to open location in google maps
         Button(
             onClick = {
-              if (!destination.location.isNullOrEmpty()) {
-                  synclocation(context, destination.location)
-              } else {
-                  Log.e("DestinationDetailed", "Location not available")
-              }
+                if (!destination.location.isNullOrEmpty()) {
+                    synclocation(context, destination.location)
+                } else {
+                    Log.e("DestinationDetailed", "Location not available")
+                }
 
             },
             modifier = Modifier
@@ -97,6 +114,66 @@ fun DestinationDetailed(destinationId: String?) {
             Text(text = "Check location")
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        //hotels Section
+        Text(
+
+            text = "Nearby Hotels",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+                .clickable { navigateToHotels(destinationId ?: "") }
+        )
+        if (hotel != null) {
+
+            HotelCard(hotel = hotel)
+        }else {
+            Text(
+                text = "No hotels available for this destination.",
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    }
+
+}
+
+@Composable
+fun HotelCard(hotel: Hotel) {
+    val name = hotel.name
+    val imageUrl = hotel.imageUrl
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(200.dp),
+        elevation = CardDefaults.elevatedCardElevation(2.dp)
+    ) {
+        Column (modifier = Modifier.padding(16.dp)) {
+            if (!imageUrl.isNullOrEmpty()) {
+                AsyncImage(
+                   model = imageUrl,
+                    contentDescription = name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                )
+            } else {
+                Text(
+                    text = "Image not available",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Text(text = name,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp))
+        }
     }
 }
 

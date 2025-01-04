@@ -16,6 +16,16 @@ class FirebaseRepository @Inject constructor(private val firestore: FirebaseFire
             destination?.let {
                 //Set the Firestore document Id as the 'id' of the destination object
                 it.id = document.id
+
+                //parse the hotel data if it's available in the document
+                val hotels = document.get("hotels") as? Map<String, Any>
+                if (hotels != null) {
+                   val hotel = Hotel(
+                        name = hotels["name"] as? String ?: "",
+                        imageUrl = hotels["imageUrl"] as? String ?: ""
+                    )
+                    it.hotels = hotel
+                }
                 destinations.add(it)
             }
         }
