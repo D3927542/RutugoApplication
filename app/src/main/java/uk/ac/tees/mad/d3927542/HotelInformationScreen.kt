@@ -1,8 +1,6 @@
 package uk.ac.tees.mad.d3927542
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -22,10 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 
 @Composable
-fun HotelInformationScreen(destinationId: String?) {
+fun HotelInformationScreen(destinationId: String?, navController: NavController) {
     val exploreViewModel: ExploreViewModel = hiltViewModel()
 
     LaunchedEffect(destinationId) {
@@ -70,6 +69,21 @@ fun HotelInformationScreen(destinationId: String?) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Book Now")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        //Logout Button
+        Button(
+            onClick = {
+                //perform logout and navigate back to the login screen
+                navController.navigate("login") {
+                    popUpTo("login") { inclusive = true }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Logout")
         }
     }
 }

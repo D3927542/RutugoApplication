@@ -51,7 +51,7 @@ fun AppNavigation() {
         }
         composable("hotelInformation/{destinationId}") { backStackEntry ->
             val destinationId = backStackEntry.arguments?.getString("destinationId")
-            HotelInformationScreen(destinationId = destinationId)
+            HotelInformationScreen(destinationId = destinationId, navController = navController)
         }
 
 
